@@ -44,9 +44,10 @@ class QuestionsListHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'comma_separated_skill_ids': {
+        'skill_ids': {
             'schema': {
-                'type': 'basestring'
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
             }
         }
     }
@@ -65,13 +66,10 @@ class QuestionsListHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, skill_ids):
         """Handles GET requests."""
 
         offset = int(self.normalized_request.get('offset'))
-
-        skill_ids = comma_separated_skill_ids.split(',')
-        skill_ids = list(set(skill_ids))
 
         try:
             _require_valid_skill_ids(skill_ids)
