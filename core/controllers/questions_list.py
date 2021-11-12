@@ -42,17 +42,32 @@ class QuestionsListHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_ids': {
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, skill_ids):
         """Handles GET requests."""
-        try:
-            offset = int(self.request.get('offset'))
-        except Exception:
-            raise self.InvalidInputException('Invalid offset')
-
-        skill_ids = comma_separated_skill_ids.split(',')
-        skill_ids = list(set(skill_ids))
+        offset = self.normalized_request.get('offset')
 
         try:
             _require_valid_skill_ids(skill_ids)
